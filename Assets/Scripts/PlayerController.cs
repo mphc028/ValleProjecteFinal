@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] GameObject ui;
 
     [SerializeField] GameObject cameraHolder;
-    [SerializeField] float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
+    [SerializeField] float mouseSensitivity, smoothTime;
 
     [SerializeField] Item[] items;
 
@@ -67,12 +67,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (!PV.IsMine) return;
         Look();
-        /*
-        SetGroundedState(false);
-        Move();
-        Jump();
-        Crouch();
-        */
+
         for (int i = 0; i < items.Length; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
@@ -108,32 +103,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (Input.GetMouseButtonDown(0)) items[itemIndex].Use();
 
         if (transform.position.y < -10) Die();
-    }
-
-    void Move()
-    {
-        Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        moveAmount = Vector3.SmoothDamp(moveAmount, moveDir * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed), ref smoothMoveVelocity, smoothTime);
-    }
-
-    void Crouch() 
-    {
-        GameObject cam = transform.GetChild(0).gameObject;
-        CapsuleCollider hitbox = GetComponent<CapsuleCollider>();
-        if (cam == null) return;
-
-        crouched = (Input.GetKey(KeyCode.LeftControl));
-
-        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPos-Vector3.up*(crouched?.5f:0), Time.deltaTime*10f);
-        hitbox.height = Mathf.Lerp(hitbox.height, ((crouched) ? 1f : 2f), Time.deltaTime*10);
-    }
-
-    void Jump()
-    {
-        if (Input.GetKey(KeyCode.Space) && grounded)
-        {
-            rb.AddForce(transform.up * jumpForce);
-        }
     }
 
     void Look()

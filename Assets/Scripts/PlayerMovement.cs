@@ -53,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     private PhotonView PV;
     private Vector3 originalCamPosition;
 
+    private ClientDebug debug;
 
     public MovementState state;
     public enum MovementState
@@ -67,6 +68,10 @@ public class PlayerMovement : MonoBehaviour
     {
         PV = GetComponent<PhotonView>();
 
+        if ( PV.IsMine ) 
+        {
+            debug = GetComponent<ClientDebug>();
+        }
         originalCamPosition = transform.GetChild(0).transform.position;
         player = transform.GetChild(0).gameObject;
 
@@ -87,12 +92,19 @@ public class PlayerMovement : MonoBehaviour
     {
 
         if (!PV.IsMine) return;
+
+
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
         MyInput();
         SpeedControl();
         StateHandler();
+
+        debug.SetDebugger("Speed: " + rb.velocity.magnitude.ToString(), 2);
+        debug.SetDebugger("Gravity: " + rb.useGravity.ToString(), 3);
+        debug.SetDebugger("OnSlope: " + OnSlope().ToString(), 4);
+        debug.SetDebugger("Grounded: " + grounded, 5);
 
         // handle drag
         if (grounded)
@@ -167,6 +179,7 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(Vector3.down * 80f, ForceMode.Force);
         }
 
+
         // on ground
         else if (grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
@@ -180,11 +193,14 @@ public class PlayerMovement : MonoBehaviour
         if (cam == null) return;
 
 
-        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPosition - Vector3.up * (crouched ? .5f : 0), Time.deltaTime * 10f);
+        //cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, originalCamPosition - Vector3.up * (crouched ? .5f : 0), Time.deltaTime * 10f);
         hitbox.height = Mathf.Lerp(hitbox.height, ((crouched) ? 1f : 2f), Time.deltaTime * 10);
 
         // turn gravity off while on slope
         rb.useGravity = !OnSlope();
+
+
+
     }
 
     private void SpeedControl()
@@ -228,9 +244,13 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
+        var ray = Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight);
+
+        if (ray)
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            Debug.DrawRay(transform.position, Vector3.down*playerHeight, Color.red);
+            Debug.Log(angle.ToString());
             return angle < maxSlopeAngle && angle != 0;
         }
 
