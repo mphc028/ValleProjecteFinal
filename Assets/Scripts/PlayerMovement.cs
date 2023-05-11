@@ -67,11 +67,8 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         PV = GetComponent<PhotonView>();
+        debug = GetComponent<ClientDebug>();
 
-        if ( PV.IsMine ) 
-        {
-            debug = GetComponent<ClientDebug>();
-        }
         originalCamPosition = transform.GetChild(0).transform.position;
         player = transform.GetChild(0).gameObject;
 
@@ -100,11 +97,6 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         SpeedControl();
         StateHandler();
-
-        debug.SetDebugger("Speed: " + rb.velocity.magnitude.ToString(), 2);
-        debug.SetDebugger("Gravity: " + rb.useGravity.ToString(), 3);
-        debug.SetDebugger("OnSlope: " + OnSlope().ToString(), 4);
-        debug.SetDebugger("Grounded: " + grounded, 5);
 
         // handle drag
         if (grounded)
@@ -167,6 +159,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
+        if (rb == null) return;
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 

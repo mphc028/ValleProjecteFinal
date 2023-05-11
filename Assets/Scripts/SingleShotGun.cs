@@ -18,8 +18,18 @@ public class SingleShotGun : Gun
         Shoot();
     }
 
+    public override void PlayAnimation(string name)
+    {
+        animator.Play(name);
+    }
+    public override void TransferMovement(float speed)
+    {
+        animator.SetFloat("speed",speed);
+    }
+
     void Shoot()
     {
+        PlayAnimation("Shoot");
         Camera cam = transform.parent.parent.GetComponentInChildren<Camera>();    
         Ray ray = cam.ViewportPointToRay(new Vector3(.5f, .5f));
         ray.origin = cam.transform.position;
@@ -28,6 +38,17 @@ public class SingleShotGun : Gun
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
         }
+    }
+
+    public void Hide()
+    {
+        PlayAnimation("Hide");
+        StartCoroutine(WaitAndDeactivate());
+    }
+
+    public void Show()
+    {
+        StartCoroutine(WaitAndActivate());
     }
 
     [PunRPC]
@@ -40,5 +61,17 @@ public class SingleShotGun : Gun
             Destroy(bulletImpactObj, 10f);
             bulletImpactObj.transform.SetParent(colliders[0].transform);
         }
+    }
+
+    IEnumerator WaitAndDeactivate()
+    {
+        yield return new WaitForSeconds(.3f);
+        gameObject.transform.GetChild(0).gameObject.SetActive(false);
+    }
+    IEnumerator WaitAndActivate()
+    {
+        yield return new WaitForSeconds(.6f);
+        
+        PlayAnimation("Show");
     }
 }

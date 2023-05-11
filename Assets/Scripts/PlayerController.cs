@@ -103,6 +103,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (Input.GetMouseButtonDown(0)) items[itemIndex].Use();
 
         if (transform.position.y < -10) Die();
+
+        items[itemIndex].TransferMovement(rb.velocity.magnitude/10);
     }
 
     void Look()
@@ -122,9 +124,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         itemIndex = _index;
         items[itemIndex].itemGameObject.SetActive(true);
 
+
         if (previousItemIndex != -1)
         {
-            items[previousItemIndex].itemGameObject.SetActive(false);
+            items[previousItemIndex].GetComponent<SingleShotGun>().Hide();
         }
 
         previousItemIndex = itemIndex;
