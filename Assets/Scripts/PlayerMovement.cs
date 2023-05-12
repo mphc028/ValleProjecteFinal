@@ -243,7 +243,6 @@ public class PlayerMovement : MonoBehaviour
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
             Debug.DrawRay(transform.position, Vector3.down*playerHeight, Color.red);
-            Debug.Log(angle.ToString());
             return angle < maxSlopeAngle && angle != 0;
         }
 

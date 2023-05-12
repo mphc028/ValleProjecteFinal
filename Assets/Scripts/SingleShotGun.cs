@@ -11,45 +11,62 @@ public class SingleShotGun : Gun
     void Awake()
     {
         PV = GetComponent<PhotonView>();
+        SetStartAmmo();
     }
 
     public override void Use()
     {
+        if (!HasAmmo()) Reload();
         Shoot();
     }
 
-    public override void PlayAnimation(string name)
-    {
-        animator.Play(name);
-    }
-    public override void TransferMovement(float speed)
-    {
-        animator.SetFloat("speed",speed);
-    }
+
+
 
     void Shoot()
     {
+        if (!canUse || !HasAmmo()) return;
+        float damage = ((GunInfo)itemInfo).damage;
+        float recoil = ((GunInfo)itemInfo).recoil;
+        float frequency = ((GunInfo)itemInfo).frequency;
+        float dispersion = ((GunInfo)itemInfo).dispersion;
+        float damageOverDistance = ((GunInfo)itemInfo).damageOverDistance;
+
+        float hDispersion = Random.Range(-1f, 1f)* dispersion;
+        float vDispersion = Random.Range(-1f, 1f) * dispersion;
+
+        ShootAmmo();
         PlayAnimation("Shoot");
-        Camera cam = transform.parent.parent.GetComponentInChildren<Camera>();    
-        Ray ray = cam.ViewportPointToRay(new Vector3(.5f, .5f));
+
+        Camera cam = transform.parent.parent.GetComponentInChildren<Camera>();
+        ProceduralRecoil rec = GetComponent<ProceduralRecoil>();
+
+        rec.Recoil();
+
+        Ray ray = cam.ViewportPointToRay(new Vector3(.5f+hDispersion, .5f+vDispersion));
         ray.origin = cam.transform.position;
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
+            float realDamage = damage/(hit.distance*damageOverDistance);
+            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(realDamage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
         }
+
+        StartCoroutine(ShootFreq(frequency));
     }
 
-    public void Hide()
+    protected IEnumerator ShootFreq(float freq)
     {
-        PlayAnimation("Hide");
-        StartCoroutine(WaitAndDeactivate());
+        canUse = false;
+        yield return new WaitForSeconds(1f/freq);
+        canUse = true;
+    }
+    public override void Reload()
+    {
+        if (!canUse || IsFullAmmo() || !HasAmmoSaved()) return;
+        StartCoroutine(ReloadTimer());
     }
 
-    public void Show()
-    {
-        StartCoroutine(WaitAndActivate());
-    }
 
     [PunRPC]
     void RPC_Shoot(Vector3 hitPosition, Vector3 hitNormal)
@@ -61,17 +78,5 @@ public class SingleShotGun : Gun
             Destroy(bulletImpactObj, 10f);
             bulletImpactObj.transform.SetParent(colliders[0].transform);
         }
-    }
-
-    IEnumerator WaitAndDeactivate()
-    {
-        yield return new WaitForSeconds(.3f);
-        gameObject.transform.GetChild(0).gameObject.SetActive(false);
-    }
-    IEnumerator WaitAndActivate()
-    {
-        yield return new WaitForSeconds(.6f);
-        
-        PlayAnimation("Show");
     }
 }

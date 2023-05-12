@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     Vector3 originalCamPos;
 
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -100,7 +101,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
         }
 
-        if (Input.GetMouseButtonDown(0)) items[itemIndex].Use();
+        if (Input.GetMouseButton(0)) items[itemIndex].Use();
+        if (Input.GetKeyDown(KeyCode.R)) items[itemIndex].Reload();
 
         if (transform.position.y < -10) Die();
 
@@ -122,8 +124,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (_index == previousItemIndex) return;
 
         itemIndex = _index;
-        items[itemIndex].itemGameObject.SetActive(true);
+        items[itemIndex].GetComponent<SingleShotGun>().Show();
 
+        
 
         if (previousItemIndex != -1)
         {
