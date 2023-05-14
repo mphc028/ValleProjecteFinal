@@ -5,6 +5,7 @@ using Photon.Pun;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
+using UnityEditor.Rendering;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
@@ -33,8 +34,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     float currentHealth = maxHealth;
 
     PlayerManager playerManager;
+    PlayerMovement playerMovement;
 
     Vector3 originalCamPos;
+
+    private float speed = 0;
 
 
     private void Awake()
@@ -50,6 +54,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (PV.IsMine)
         {
             originalCamPos = transform.GetChild(0).localPosition;
+            playerMovement = GetComponent<PlayerMovement>();
             EquipItem(0);
         }
         else
@@ -103,10 +108,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
         if (Input.GetMouseButton(0)) items[itemIndex].Use();
         if (Input.GetKeyDown(KeyCode.R)) items[itemIndex].Reload();
+        if (Input.GetKeyDown(KeyCode.F)) items[itemIndex].Inspect();
 
         if (transform.position.y < -10) Die();
 
-        items[itemIndex].TransferMovement(rb.velocity.magnitude/10);
+        speed = Mathf.Lerp(speed, playerMovement.isGrounded() ? (rb.velocity.magnitude / 10) : 0, Time.deltaTime*15); 
+
+        items[itemIndex].TransferMovement(speed);
     }
 
     void Look()

@@ -41,6 +41,10 @@ public abstract class Gun : Item
         return ammo >= roundAmmo;
     }
 
+    public override void Inspect()
+    {
+        if (canUse) PlayAnimation("Inspect");
+    }
 
 
     public void FillBullets()

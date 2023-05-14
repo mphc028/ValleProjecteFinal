@@ -15,4 +15,7 @@ public class GunInfo : ItemInfo
     public int maxBullets = 30;
     public int savedBullets = 90;
 
+    public AudioClip[] useSounds;
+    public AudioClip[] reloadSounds;
+    public AudioClip[] drawSounds;
 }

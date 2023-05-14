@@ -11,6 +11,7 @@ public class SingleShotGun : Gun
     void Awake()
     {
         PV = GetComponent<PhotonView>();
+        audioSrc = GetComponent<AudioSource>();
         SetStartAmmo();
     }
 
@@ -20,7 +21,10 @@ public class SingleShotGun : Gun
         Shoot();
     }
 
-
+    private void OnEnable()
+    {
+   
+    }
 
 
     void Shoot()
@@ -31,6 +35,9 @@ public class SingleShotGun : Gun
         float frequency = ((GunInfo)itemInfo).frequency;
         float dispersion = ((GunInfo)itemInfo).dispersion;
         float damageOverDistance = ((GunInfo)itemInfo).damageOverDistance;
+        AudioClip sound = ((GunInfo)itemInfo).useSounds[Random.Range(0,( (GunInfo)itemInfo).useSounds.Length - 1)];
+        audioSrc.clip = sound;
+        audioSrc.Play();
 
         float hDispersion = Random.Range(-1f, 1f)* dispersion;
         float vDispersion = Random.Range(-1f, 1f) * dispersion;
@@ -64,6 +71,11 @@ public class SingleShotGun : Gun
     public override void Reload()
     {
         if (!canUse || IsFullAmmo() || !HasAmmoSaved()) return;
+
+        AudioClip sound = ((GunInfo)itemInfo).reloadSounds[Random.Range(0, ((GunInfo)itemInfo).reloadSounds.Length - 1)];
+        audioSrc.clip = sound;
+        audioSrc.Play();
+
         StartCoroutine(ReloadTimer());
     }
 

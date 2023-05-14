@@ -7,11 +7,13 @@ public abstract class Item : MonoBehaviour
     public ItemInfo itemInfo;
     public GameObject itemGameObject;
     public Animator animator;
+    protected AudioSource audioSrc;
 
     protected bool canUse = true;
 
     public abstract void Use();
     public abstract void Reload();
+    public abstract void Inspect();
 
 
 
@@ -34,6 +36,9 @@ public abstract class Item : MonoBehaviour
 
     public void Show()
     {
+        AudioClip sound = ((GunInfo)itemInfo).drawSounds[Random.Range(0, ((GunInfo)itemInfo).drawSounds.Length - 1)];
+        audioSrc.clip = sound;
+        audioSrc.Play();
         canUse = true;
         if (!gameObject.transform.GetChild(0).gameObject.activeSelf) StartCoroutine(WaitAndActivate());
         else gameObject.transform.GetChild(0).gameObject.SetActive(false);
