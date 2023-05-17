@@ -26,7 +26,6 @@ public class SingleShotGun : Gun
    
     }
 
-
     void Shoot()
     {
         if (!canUse || !HasAmmo()) return;
@@ -35,9 +34,9 @@ public class SingleShotGun : Gun
         float frequency = ((GunInfo)itemInfo).frequency;
         float dispersion = ((GunInfo)itemInfo).dispersion;
         float damageOverDistance = ((GunInfo)itemInfo).damageOverDistance;
-        AudioClip sound = ((GunInfo)itemInfo).useSounds[Random.Range(0,( (GunInfo)itemInfo).useSounds.Length - 1)];
-        audioSrc.clip = sound;
-        audioSrc.Play();
+        PlaySound(((GunInfo)itemInfo).useSounds[Random.Range(0, ((GunInfo)itemInfo).useSounds.Length - 1)]);
+
+
 
         float hDispersion = Random.Range(-1f, 1f)* dispersion;
         float vDispersion = Random.Range(-1f, 1f) * dispersion;
@@ -48,17 +47,33 @@ public class SingleShotGun : Gun
         Camera cam = transform.parent.parent.GetComponentInChildren<Camera>();
         ProceduralRecoil rec = GetComponent<ProceduralRecoil>();
 
+        Vector3 hitpoint = bulletDir.position;
+
         rec.Recoil();
 
         Ray ray = cam.ViewportPointToRay(new Vector3(.5f+hDispersion, .5f+vDispersion));
         ray.origin = cam.transform.position;
+
+        
+
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
+            hitpoint = hit.point;
             float realDamage = damage/(hit.distance*damageOverDistance);
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(realDamage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
         }
+        else
+        {
+            PV.RPC("RPC_Shoot", RpcTarget.All, null, null);
+        }
 
+        emits[0].transform.LookAt(hitpoint);
+        foreach (var emit in emits)
+        {
+            
+            emit.Emit(1);
+        }
         StartCoroutine(ShootFreq(frequency));
     }
 
@@ -72,9 +87,8 @@ public class SingleShotGun : Gun
     {
         if (!canUse || IsFullAmmo() || !HasAmmoSaved()) return;
 
-        AudioClip sound = ((GunInfo)itemInfo).reloadSounds[Random.Range(0, ((GunInfo)itemInfo).reloadSounds.Length - 1)];
-        audioSrc.clip = sound;
-        audioSrc.Play();
+        PlaySound(((GunInfo)itemInfo).reloadSounds[Random.Range(0, ((GunInfo)itemInfo).reloadSounds.Length - 1)]);
+
 
         StartCoroutine(ReloadTimer());
     }
@@ -83,6 +97,9 @@ public class SingleShotGun : Gun
     [PunRPC]
     void RPC_Shoot(Vector3 hitPosition, Vector3 hitNormal)
     {
+        PlaySound(((GunInfo)itemInfo).useSounds[Random.Range(0, ((GunInfo)itemInfo).useSounds.Length - 1)]);
+
+        if (hitPosition == null) return;
         Collider[] colliders = Physics.OverlapSphere(hitPosition, .3f);
         if (colliders.Length != 0) 
         { 

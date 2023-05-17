@@ -27,6 +27,7 @@ public class ProceduralRecoil : MonoBehaviour
         targetRotation = Vector3.Lerp(targetRotation, Vector3.zero, Time.deltaTime * returnAmount);
         currentPosition = Vector3.Slerp(currentRotation, targetRotation, Time.fixedDeltaTime*snappiness);
         transform.localRotation = Quaternion.Euler(currentRotation);
+        if (cam == null) return;
         cam.localRotation = Quaternion.Euler(-targetRotation);
         Back();
     }

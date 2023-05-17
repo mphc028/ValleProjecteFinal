@@ -17,6 +17,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         Instance = this;
     }
 
+
+
     public override void OnEnable()
     {
         base.OnEnable();

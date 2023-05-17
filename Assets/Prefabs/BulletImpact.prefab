@@ -170,7 +170,7 @@ PrefabInstance:
     - target: {fileID: 3438720405160485452, guid: ec0c68a213005da44bde74cb2e97ef27,
         type: 3}
       propertyPath: lengthInSec
-      value: 0.3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 3438720405160485452, guid: ec0c68a213005da44bde74cb2e97ef27,
         type: 3}

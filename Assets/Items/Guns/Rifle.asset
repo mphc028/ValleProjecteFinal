@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   itemName: Rifle
+  image: {fileID: 21300000, guid: 7db107b6332f6184fbd278bd62976828, type: 3}
   damage: 50
-  damageOverDistance: 1
+  damageOverDistance: 0.5
   frequency: 15
   dispersion: 0.01
   recoil: 1

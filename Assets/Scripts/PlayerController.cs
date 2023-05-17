@@ -6,10 +6,18 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Realtime;
 using UnityEngine.UI;
 using UnityEditor.Rendering;
+using TMPro;
 
 public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     [SerializeField] Image healthbarImage;
+    [SerializeField] Image gunImage;
+    [SerializeField] TMP_Text bulletsText;
+    [SerializeField] TMP_Text magsText;
+    [SerializeField] TMP_Text hpText;
+    [SerializeField] TMP_Text maxHpText;
+    [SerializeField] TMP_Text nameText;
+
     [SerializeField] GameObject ui;
 
     [SerializeField] GameObject cameraHolder;
@@ -41,6 +49,14 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     private float speed = 0;
 
 
+    public void UpdateGunText(int bullets, int mags, Sprite image)
+    {
+        bulletsText.text = bullets.ToString();
+        magsText.text = "/"+mags.ToString();
+        if (image == null) return;
+        gunImage.sprite = image;
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -55,6 +71,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         {
             originalCamPos = transform.GetChild(0).localPosition;
             playerMovement = GetComponent<PlayerMovement>();
+            nameText.text = GetComponent<PhotonView>().Owner.NickName;
             EquipItem(0);
         }
         else
@@ -106,7 +123,11 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
             }
         }
 
-        if (Input.GetMouseButton(0)) items[itemIndex].Use();
+        if (Input.GetMouseButton(0))
+        {
+            items[itemIndex].Use();
+            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetSavedAmmo(), null);
+        }
         if (Input.GetKeyDown(KeyCode.R)) items[itemIndex].Reload();
         if (Input.GetKeyDown(KeyCode.F)) items[itemIndex].Inspect();
 
@@ -134,7 +155,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         itemIndex = _index;
         items[itemIndex].GetComponent<SingleShotGun>().Show();
 
-        
 
         if (previousItemIndex != -1)
         {
@@ -145,6 +165,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         if (PV.IsMine)
         {
+            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetSavedAmmo(), ((Gun)items[itemIndex]).GetSprite() ?? null);
+
             Hashtable hash = new Hashtable();
             hash.Add("itemIndex", itemIndex);
             PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
@@ -181,6 +203,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         currentHealth -= damage;
 
         healthbarImage.fillAmount = currentHealth / maxHealth;
+        hpText.text = ((int)currentHealth).ToString();
+
 
         if (currentHealth <= 0)
         {

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c81e519e1a44fe44aec295956aacd11, type: 3}
+  m_Name: Rifle 1
+  m_EditorClassIdentifier: 
+  itemName: Rifle2
+  image: {fileID: 21300000, guid: 04d9cdfc54a6a485d83a3d78a3139505, type: 3}
+  damage: 50
+  damageOverDistance: 0.5
+  frequency: 15
+  dispersion: 0.01
+  recoil: 1
+  weight: 1
+  reloadTime: 1.5
+  maxBullets: 30
+  savedBullets: 120
+  useSounds:
+  - {fileID: 8300000, guid: 6d0c6fe36681e6e4eb24d8d1e5eeee94, type: 3}
+  - {fileID: 8300000, guid: aac6c46321803684bb4b862cb3be7e3b, type: 3}
+  reloadSounds:
+  - {fileID: 8300000, guid: 6ec7aaee99d937543b3982f77b14dc1f, type: 3}
+  drawSounds:
+  - {fileID: 8300000, guid: 2fd7d5cb9751dd74b9bda09ffd42b330, type: 3}

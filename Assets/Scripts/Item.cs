@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Item : MonoBehaviour
+public abstract class Item : MonoBehaviourPunCallbacks
 {
     public ItemInfo itemInfo;
     public GameObject itemGameObject;
@@ -15,7 +16,17 @@ public abstract class Item : MonoBehaviour
     public abstract void Reload();
     public abstract void Inspect();
 
+    public Sprite GetSprite()
+    {
+        return itemInfo.image;
+    }
 
+    [PunRPC]
+    public void PlaySound(AudioClip sound)
+    {
+        audioSrc.clip = sound;
+        audioSrc.Play();
+    }
 
     public void PlayAnimation(string name)
     {
@@ -36,9 +47,7 @@ public abstract class Item : MonoBehaviour
 
     public void Show()
     {
-        AudioClip sound = ((GunInfo)itemInfo).drawSounds[Random.Range(0, ((GunInfo)itemInfo).drawSounds.Length - 1)];
-        audioSrc.clip = sound;
-        audioSrc.Play();
+        PlaySound(((GunInfo)itemInfo).drawSounds[Random.Range(0, ((GunInfo)itemInfo).drawSounds.Length - 1)]);
         canUse = true;
         if (!gameObject.transform.GetChild(0).gameObject.activeSelf) StartCoroutine(WaitAndActivate());
         else gameObject.transform.GetChild(0).gameObject.SetActive(false);

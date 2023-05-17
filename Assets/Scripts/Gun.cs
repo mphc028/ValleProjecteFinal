@@ -9,6 +9,12 @@ public abstract class Gun : Item
     int savedAmmo = 0;
     int roundAmmo = 0;
 
+    [SerializeField]
+    protected ParticleSystem[] emits;
+
+    [SerializeField]
+    protected Transform bulletDir;
+
     public abstract override void Use();
     public abstract override void Reload();
 
@@ -24,6 +30,16 @@ public abstract class Gun : Item
     public bool HasAmmo()
     {
         return ammo > 0;
+    }
+
+    public int GetAmmo()
+    { 
+        return ammo; 
+    }
+
+    public int GetSavedAmmo()
+    {
+        return savedAmmo;
     }
 
     public bool HasAmmoSaved()
@@ -56,6 +72,7 @@ public abstract class Gun : Item
             ammo += bulletsToReload;
             savedAmmo -= bulletsToReload;
         }
+        transform.parent.parent.parent.GetComponent<PlayerController>().UpdateGunText(ammo, savedAmmo, null);
     }
 
     protected override IEnumerator ReloadTimer()
