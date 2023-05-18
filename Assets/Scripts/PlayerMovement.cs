@@ -40,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit slopeHit;
     private bool exitingSlope;
 
+    [SerializeField] Animator fullBody;
+
 
     public Transform orientation;
 
@@ -87,9 +89,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-
-        if (!PV.IsMine) return;
-
+        if (!PV.IsMine)
+        {
+            // What other players see
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.R)) fullBody.Play("Reload");
 
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
@@ -126,6 +131,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         crouched = (Input.GetKey(KeyCode.LeftControl));
+
+
+
+
+
 
     }
 

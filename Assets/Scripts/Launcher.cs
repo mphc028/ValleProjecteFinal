@@ -28,6 +28,9 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        if (PhotonNetwork.IsConnected) return;
         Debug.Log("Connecting to Master");
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -73,8 +76,15 @@ public class Launcher : MonoBehaviourPunCallbacks
             Destroy(child.gameObject);
         }
 
+        Hashtable hash = new Hashtable();
+        hash.Add("kills", 0);
+        hash.Add("deaths", 0);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+
         for (int i = 0; i < players.Count(); i++)
         {
+
+
             Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
         }
 
@@ -134,4 +144,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
     }
+
+
+
 }

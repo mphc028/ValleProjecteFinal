@@ -21,10 +21,6 @@ public class SingleShotGun : Gun
         Shoot();
     }
 
-    private void OnEnable()
-    {
-   
-    }
 
     void Shoot()
     {

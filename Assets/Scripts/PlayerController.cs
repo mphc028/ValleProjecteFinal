@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     [SerializeField] GameObject cameraHolder;
     [SerializeField] float mouseSensitivity, smoothTime;
+    [SerializeField] private GameObject playerModel;
+    [SerializeField] private GameObject playerFPModel;
 
     [SerializeField] Item[] items;
 
@@ -69,6 +71,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
+            Renderer[] rs = playerModel.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in rs) r.enabled = false;
+
+
             originalCamPos = transform.GetChild(0).localPosition;
             playerMovement = GetComponent<PlayerMovement>();
             nameText.text = GetComponent<PhotonView>().Owner.NickName;
@@ -76,6 +82,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
         {
+            Renderer[] rs = playerFPModel.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in rs) r.enabled = false;
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
             Destroy(ui);
@@ -89,7 +97,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         Cursor.visible = false;
 
         if (!PV.IsMine) return;
-        Look();
+        
+        if (Time.timeScale > .5f)Look();
 
         for (int i = 0; i < items.Length; i++)
         {

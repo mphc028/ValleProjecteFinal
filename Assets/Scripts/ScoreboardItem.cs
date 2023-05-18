@@ -19,7 +19,13 @@ public class ScoreboardItem : MonoBehaviourPunCallbacks
         this.player = player;
         usernameText.text = player.NickName;
 
-        UpdateStats();
+        FirstStats();
+    }
+
+    void FirstStats()
+    {
+        killsText.text = "0";
+        deathsText.text = "0";
     }
 
     void UpdateStats()
