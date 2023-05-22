@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     [SerializeField] GameObject cameraHolder;
     [SerializeField] float mouseSensitivity, smoothTime;
     [SerializeField] private GameObject playerModel;
+    [SerializeField] private GameObject playerGun;
     [SerializeField] private GameObject playerFPModel;
 
     [SerializeField] Item[] items;
@@ -51,6 +52,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     private float speed = 0;
 
 
+    private GameObject[] SelectAllChildren(GameObject go)
+    {
+        GameObject[] chGo = new GameObject[go.transform.childCount];
+        for (int i = 0; i < chGo.Length; i++)
+        {
+            chGo[i] = go.transform.GetChild(i).gameObject;
+        }
+        return chGo;
+    }
+
     public void UpdateGunText(int bullets, int mags, Sprite image)
     {
         bulletsText.text = bullets.ToString();
@@ -71,9 +82,17 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     {
         if (PV.IsMine)
         {
-            Renderer[] rs = playerModel.GetComponentsInChildren<Renderer>();
-            foreach (Renderer r in rs) r.enabled = false;
+            SkinnedMeshRenderer[] renderers = playerModel.transform.GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer renderer in renderers) renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+            playerGun.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
 
+            foreach (Item gm in items)
+            {
+                foreach (SkinnedMeshRenderer mesh in gm.meshes)
+                {
+                    mesh.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                }
+            }
 
             originalCamPos = transform.GetChild(0).localPosition;
             playerMovement = GetComponent<PlayerMovement>();
@@ -82,14 +101,26 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         }
         else
         {
-            Renderer[] rs = playerFPModel.GetComponentsInChildren<Renderer>();
-            foreach (Renderer r in rs) r.enabled = false;
+            foreach (Item gm in items)
+            {
+                foreach (SkinnedMeshRenderer mesh in gm.meshes)
+                {
+                    mesh.enabled = false;
+                }
+            }
+
+
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
             Destroy(ui);
+
+
         }
 
+
+
     }
+
 
     private void Update()
     {
@@ -97,8 +128,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         Cursor.visible = false;
 
         if (!PV.IsMine) return;
-        
-        if (Time.timeScale > .5f)Look();
+
 
         for (int i = 0; i < items.Length; i++)
         {
@@ -135,18 +165,18 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         if (Input.GetMouseButton(0))
         {
             items[itemIndex].Use();
-            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetSavedAmmo(), null);
+            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetRoundAmmo(), null);
         }
         if (Input.GetKeyDown(KeyCode.R)) items[itemIndex].Reload();
         if (Input.GetKeyDown(KeyCode.F)) items[itemIndex].Inspect();
 
         if (transform.position.y < -10) Die();
 
-        speed = Mathf.Lerp(speed, playerMovement.isGrounded() ? (rb.velocity.magnitude / 10) : 0, Time.deltaTime*15); 
+        speed = Mathf.Lerp(speed, GetComponent<CharacterController>().isGrounded ? (GetComponent<CharacterController>().velocity.magnitude / 10) : 0, Time.deltaTime*15);
 
         items[itemIndex].TransferMovement(speed);
     }
-
+    /*
     void Look()
     {
         transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
@@ -155,7 +185,9 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -90f, 90f);
 
         cameraHolder.transform.localEulerAngles = Vector3.left * verticalLookRotation;
-    }
+    }*/
+
+
 
     void EquipItem(int _index)
     {
@@ -174,7 +206,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
         
         if (PV.IsMine)
         {
-            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetSavedAmmo(), ((Gun)items[itemIndex]).GetSprite() ?? null);
+            UpdateGunText(((Gun)items[itemIndex]).GetAmmo(), ((Gun)items[itemIndex]).GetRoundAmmo(), ((Gun)items[itemIndex]).GetSprite() ?? null);
 
             Hashtable hash = new Hashtable();
             hash.Add("itemIndex", itemIndex);
@@ -193,12 +225,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
     public void SetGroundedState(bool _grounded)
     {
         grounded = Physics.Raycast(transform.position, Vector3.down, 2 * 0.5f + 0.2f, LayerMask.NameToLayer("Ground"));
-    }
-
-    private void FixedUpdate()
-    {
-        if (!PV.IsMine) return;
-        rb.MovePosition(rb.position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
     }
 
     public void TakeDamage(float damage)

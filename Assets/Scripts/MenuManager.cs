@@ -8,6 +8,11 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] Menu[] menus;
 
+    public void EndGame()
+    {
+        Application.Quit();
+    }
+
     private void Awake()
     {
         Instance = this;

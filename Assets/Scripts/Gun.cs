@@ -9,6 +9,7 @@ public abstract class Gun : Item
     int savedAmmo = 0;
     int roundAmmo = 0;
 
+
     [SerializeField]
     protected ParticleSystem[] emits;
 
@@ -42,6 +43,12 @@ public abstract class Gun : Item
         return savedAmmo;
     }
 
+    public int GetRoundAmmo()
+    {
+        return roundAmmo;
+    }
+
+
     public bool HasAmmoSaved()
     {
         return savedAmmo > 0;
@@ -72,18 +79,26 @@ public abstract class Gun : Item
             ammo += bulletsToReload;
             savedAmmo -= bulletsToReload;
         }
-        transform.parent.parent.parent.GetComponent<PlayerController>().UpdateGunText(ammo, savedAmmo, null);
+        transform.parent.parent.parent.parent.GetComponent<PlayerController>().UpdateGunText(ammo, roundAmmo, null);
     }
 
     protected override IEnumerator ReloadTimer()
     {
+        //player = transform.parent.parent.parent.parent.GetComponent<PlayerMovement>();
+        Debug.Log(player == null);
+
         Debug.Log("Before" + ammo.ToString() + "/" + savedAmmo.ToString());
         Debug.Log("Reload");
+
         PlayAnimation("Reload");
+        //player.SetBodyState(1);
+        
+
         canUse = false;
         yield return new WaitForSeconds(((GunInfo)itemInfo).reloadTime);
         FillBullets();
         Debug.Log("After" + ammo.ToString() + "/" + savedAmmo.ToString());
         canUse = true;
+        //player.SetBodyState(0);
     }
 }

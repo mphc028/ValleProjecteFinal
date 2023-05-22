@@ -19,6 +19,8 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] Transform playerListContent;
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
+    [SerializeField] GameObject menuPlayerModel;
+    [SerializeField] GameObject loadingMenuChild;
 
     private void Awake()
     {
@@ -28,6 +30,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        menuPlayerModel.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         if (PhotonNetwork.IsConnected) return;
@@ -39,6 +42,11 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Connected to Master");
         PhotonNetwork.JoinLobby();
+        menuPlayerModel.SetActive(true);
+        loadingMenuChild.SetActive(false);
+
+
+
         PhotonNetwork.AutomaticallySyncScene = true;
     }
 
@@ -56,7 +64,8 @@ public class Launcher : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(roomNameInputField.text)) return;
         RoomOptions roomOptions = new RoomOptions();
         Hashtable options = new Hashtable();
-        options.Add("Time", 600);
+        //options.Add("Time", 30); // Testing room
+        options.Add("Time", 300);
         roomOptions.CustomRoomProperties= options;
 
         PhotonNetwork.CreateRoom(roomNameInputField.text, roomOptions);
@@ -83,8 +92,6 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < players.Count(); i++)
         {
-
-
             Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
         }
 
@@ -104,7 +111,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        PhotonNetwork.LoadLevel(1);
+        PhotonNetwork.LoadLevel(2);
     }
 
     public void LeaveRoom()

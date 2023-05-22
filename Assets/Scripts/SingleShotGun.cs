@@ -52,8 +52,9 @@ public class SingleShotGun : Gun
 
         
 
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit) && hit.collider.gameObject != gameObject)
         {
+            
             hitpoint = hit.point;
             float realDamage = damage/(hit.distance*damageOverDistance);
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(realDamage);

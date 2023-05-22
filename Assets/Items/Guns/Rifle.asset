@@ -18,11 +18,11 @@ MonoBehaviour:
   damageOverDistance: 0.5
   frequency: 15
   dispersion: 0.01
-  recoil: 1
+  recoil: 2.4
   weight: 1
   reloadTime: 1.5
   maxBullets: 30
-  savedBullets: 90
+  savedBullets: 99999
   useSounds:
   - {fileID: 8300000, guid: 6d0c6fe36681e6e4eb24d8d1e5eeee94, type: 3}
   - {fileID: 8300000, guid: aac6c46321803684bb4b862cb3be7e3b, type: 3}

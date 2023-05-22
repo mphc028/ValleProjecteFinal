@@ -10,11 +10,20 @@ public abstract class Item : MonoBehaviourPunCallbacks
     public Animator animator;
     protected AudioSource audioSrc;
 
+    protected PlayerMovement player;
+
+    [SerializeField] public SkinnedMeshRenderer[] meshes;
+
     protected bool canUse = true;
 
     public abstract void Use();
     public abstract void Reload();
     public abstract void Inspect();
+
+    private void Start()
+    {
+        player = transform.parent.parent.parent.GetComponent<PlayerMovement>();
+    }
 
     public Sprite GetSprite()
     {

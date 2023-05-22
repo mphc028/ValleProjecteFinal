@@ -1,10 +1,10 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Hastable = ExitGames.Client.Photon.Hashtable;
 using TMPro;
+using UnityEngine.Networking;
 
 public class RoomTimer : MonoBehaviourPunCallbacks
 {
@@ -45,6 +45,7 @@ public class RoomTimer : MonoBehaviourPunCallbacks
             {
                 player.CustomProperties.TryGetValue("kills", out object kills);
                 if (kills != null)
+                    if (player.CustomProperties.TryGetValue("id", out object userId)) StartCoroutine(AddXP((int)kills, (int)userId));
                     if ((int)kills > maxKills)
                     {
                         maxKills = (int)kills;
@@ -75,6 +76,31 @@ public class RoomTimer : MonoBehaviourPunCallbacks
         }
     }
 
+    IEnumerator AddXP(int kills, int userId)
+    {
+        // Obtener el ID del jugador y la experiencia del jugador (puedes reemplazar estos valores con los adecuados)
+        int userExperience = 20;
+
+        // Crear los datos que se enviarán en la petición POST
+        WWWForm form = new WWWForm();
+        form.AddField("userId", userId);
+        form.AddField("userExperience", userExperience * kills);
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Post("https://imanol.xyz/api/players/index.php", form))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Error en la solicitud: " + webRequest.error);
+            }
+            else
+            {
+                Debug.Log("Datos del jugador enviados correctamente.");
+            }
+        }
+    }
+
     IEnumerator Timer()
     {
         yield return new WaitForSeconds(1F);
@@ -93,7 +119,7 @@ public class RoomTimer : MonoBehaviourPunCallbacks
 
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.AutomaticallySyncScene = false;
-        PhotonNetwork.LoadLevel(0);
+        PhotonNetwork.LoadLevel(1);
 
     }
 }
