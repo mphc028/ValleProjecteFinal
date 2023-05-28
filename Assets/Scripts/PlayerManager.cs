@@ -12,6 +12,8 @@ public class PlayerManager : MonoBehaviour
     PhotonView PV;
 
     GameObject controller;
+    [SerializeField] AudioClip killSound;
+    [SerializeField] GameObject ragdoll;
 
     int kills;
     int deaths;
@@ -40,6 +42,7 @@ public class PlayerManager : MonoBehaviour
 
     public void Die()
     {
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "Ragdoll"), controller.transform.position, controller.transform.rotation, 0);
         PhotonNetwork.Destroy(controller);
         CreateController();
 
@@ -52,6 +55,8 @@ public class PlayerManager : MonoBehaviour
 
     public void GetKill()
     {
+
+
         PV.RPC(nameof(RPC_GetKill), PV.Owner);
     }
 
@@ -59,7 +64,16 @@ public class PlayerManager : MonoBehaviour
     void RPC_GetKill()
     {
         kills++;
-
+        controller.GetComponent<AudioSource>().clip = killSound;
+        controller.GetComponent<AudioSource>().Play();
+        if (controller.GetComponent<AudioSource>().pitch < 2)
+        {
+            controller.GetComponent<AudioSource>().pitch *= 1.0594f;
+        }
+        else
+        {
+            controller.GetComponent<AudioSource>().pitch = 1;
+        }
         Hashtable hash = new Hashtable();
         hash.Add("kills", kills);
         hash.Add("id", PlayerPrefs.GetInt("id"));

@@ -14,7 +14,7 @@ namespace VHS
                 [Space,Header("Custom Classes")]
                 [SerializeField] private CameraZoom cameraZoom = null;
                 [SerializeField] private CameraSwaying cameraSway = null;
-
+                private bool canRotate = true;
             #endregion
 
             #region Settings
@@ -51,15 +51,18 @@ namespace VHS
             void LateUpdate()
             {
             if (!transform.parent.GetComponent<PhotonView>().IsMine) return;
+            canRotate = (Cursor.lockState != CursorLockMode.None);
+
                 CalculateRotation();
                 SmoothRotation();
                 ApplyRotation();
                 HandleZoom();
-            }
+            
+        }
         #endregion
 
         #region Custom Methods
-            void GetComponents()
+        void GetComponents()
             {
                 m_pitchTranform = transform.GetChild(0).transform;
                 m_cam = GetComponentInChildren<Camera>();
@@ -79,9 +82,12 @@ namespace VHS
 
             void CalculateRotation()
             {
-                m_desiredYaw += camInputData.InputVector.x * sensitivity.x * Time.deltaTime;
-                m_desiredPitch -= camInputData.InputVector.y * sensitivity.y * Time.deltaTime;
 
+
+                    m_desiredYaw += camInputData.InputVector.x * sensitivity.x * Time.deltaTime;
+                    m_desiredPitch -= camInputData.InputVector.y * sensitivity.y * Time.deltaTime;
+
+                
                 m_desiredPitch = Mathf.Clamp(m_desiredPitch,lookAngleMinMax.x,lookAngleMinMax.y);
             }
 
@@ -93,6 +99,7 @@ namespace VHS
 
             void ApplyRotation()
             {
+            if (!canRotate) return;
                 transform.eulerAngles = new Vector3(0f,m_yaw,0f);
                 m_pitchTranform.localEulerAngles = new Vector3(m_pitch,0f,0f);
             }

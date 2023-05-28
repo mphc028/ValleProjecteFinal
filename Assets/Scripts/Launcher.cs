@@ -128,6 +128,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     }
 
+    public void JoinRandomRoom()
+    {
+        PhotonNetwork.JoinRandomRoom();
+    }
+
     public override void OnLeftRoom()
     {
         MenuManager.Instance.OpenMenu("title");

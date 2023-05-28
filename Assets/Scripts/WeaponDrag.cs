@@ -54,7 +54,7 @@ public class WeaponRotationDrag : MonoBehaviour
         }
 
         //weapon default rotation transform has to be (0, 0, 0)
-        Quaternion newRotation = Quaternion.Euler(localRotation.x, localRotation.y + y, localRotation.z + z);
+        Quaternion newRotation = Quaternion.Euler(localRotation.x + z, localRotation.y + y, localRotation.z );
         transform.localRotation = Quaternion.Lerp(transform.localRotation, newRotation, (Time.deltaTime * smooth));
     }
 }

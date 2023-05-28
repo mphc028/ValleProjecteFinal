@@ -188,6 +188,18 @@ namespace VHS
                     ApplyMovement();
 
                     m_previouslyGrounded = m_isGrounded;
+
+                    AudioSource walkAudio = gameObject.transform.GetChild(0).GetComponent<AudioSource>();
+
+                    if (m_isGrounded && m_characterController.velocity.magnitude>0.1)
+                    {
+                    walkAudio.pitch = .8f+m_characterController.velocity.magnitude/20;
+                    walkAudio.volume = Mathf.Lerp(walkAudio.volume, .5f, Time.deltaTime * 20f);
+                    }
+                    else
+                    {
+                    walkAudio.volume = Mathf.Lerp(walkAudio.volume, 0, Time.deltaTime * 100f);
+                    }
                 }
             }
 

@@ -69,6 +69,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b600d637ddfbf4498fc0545c95541ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  killSound: {fileID: 8300000, guid: 3ec71a2ad2ef2d646a11dcf0e9019579, type: 3}
+  ragdoll: {fileID: 5734509691367166017, guid: ce31b2fec9e4360439fa55e1e1929270, type: 3}
 --- !u!114 &-4369347102950842118
 MonoBehaviour:
   m_ObjectHideFlags: 0

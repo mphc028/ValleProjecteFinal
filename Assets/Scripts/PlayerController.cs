@@ -124,9 +124,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable
 
     private void Update()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         if (!PV.IsMine) return;
 
 

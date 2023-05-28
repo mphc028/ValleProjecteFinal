@@ -56,7 +56,7 @@ public class SingleShotGun : Gun
         {
             
             hitpoint = hit.point;
-            float realDamage = damage/(hit.distance*damageOverDistance);
+            float realDamage = damage/(hit.distance*(damageOverDistance/6) / Mathf.Pow(Vector3.Distance(hit.point, hit.collider.transform.position),2));
             hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(realDamage);
             PV.RPC("RPC_Shoot", RpcTarget.All, hit.point, hit.normal);
         }
